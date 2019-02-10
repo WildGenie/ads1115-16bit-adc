@@ -5,77 +5,88 @@
     xmlns:local="using:ADC"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Height="878.5">
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" RenderTransformOrigin="0.42,0.512">
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition/>
+            <RowDefinition Height="110"/>
+            <RowDefinition Height="145"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
 
-        <StackPanel Grid.Row="1" Orientation="Vertical">
-            <TextBlock Text="Sampling mode" TextAlignment="Center" FontSize="20"/>
-            <ComboBox HorizontalAlignment="Center" Width="300"
-                      ItemsSource="{Binding Path=Modes}"
-                      SelectedItem="{Binding Setting.Mode, Mode=TwoWay}"
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Grid.ColumnSpan="1">
+
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="Sampling mode" TextAlignment="Center" FontSize="20"/>
+                <ComboBox HorizontalAlignment="Center" Width="300"
+                    ItemsSource="{Binding Modes}"
+                    SelectedItem="{Binding Setting.Mode, Mode=TwoWay}"
                       />
-            <TextBlock Text="Address is:" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                <TextBlock Text="Address is:" HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
 
-            <TextBlock Text="Adc Settings" TextAlignment="Center" FontSize="20"/>
-            <TextBlock Text="Input" HorizontalAlignment="Center"/>
-            <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
-                      ItemsSource="{Binding Path=Inputs}"
-                      SelectedItem="{Binding Setting.Input, Mode=TwoWay}"/>
-            <TextBlock Text="Pga" HorizontalAlignment="Center"/>
-            <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
-                      ItemsSource="{Binding Path=Pgas}"
-                      SelectedItem="{Binding Setting.Pga, Mode=TwoWay}"/>
-            <TextBlock Text="DataRate" HorizontalAlignment="Center"/>
-            <ComboBox HorizontalAlignment="Center" Width="300" Margin="0,0,0,20"
-                      ItemsSource="{Binding Path=DataRates}"
-                      SelectedItem="{Binding Setting.DataRate, Mode=TwoWay}"/>
+                <TextBlock Text="Adc Settings" TextAlignment="Center" FontSize="20"/>
+                <TextBlock Text="Input" HorizontalAlignment="Center"/>
+                <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
+                    ItemsSource="{Binding Inputs}"
+                    SelectedItem="{Binding Setting.Input, Mode=TwoWay}"/>
+                <TextBlock Text="Pga" HorizontalAlignment="Center"/>
+                <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
+                    ItemsSource="{Binding Pgas}"
+                    SelectedItem="{Binding Setting.Pga, Mode=TwoWay}"/>
+                <TextBlock Text="DataRate" HorizontalAlignment="Center"/>
+                <ComboBox HorizontalAlignment="Center" Width="300" Margin="0,0,0,20"
+                    ItemsSource="{Binding DataRates}"
+                    SelectedItem="{Binding Setting.DataRate, Mode=TwoWay}"/>
 
 
-            <TextBlock Text="Comparator settings" TextAlignment="Center" FontSize="20"/>
-            <TextBlock Text="Comparator mode" HorizontalAlignment="Center"/>
-            <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
-                      ItemsSource="{Binding Path=ComparatorModes}"
-                      SelectedItem="{Binding Setting.ComMode, Mode=TwoWay}"/>
-            <TextBlock Text="Comparator polarity" HorizontalAlignment="Center"/>
-            <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
-                      ItemsSource="{Binding Path=ComparatorPolarities}"
-                      SelectedItem="{Binding Setting.ComPolarity, Mode=TwoWay}"/>
-            <TextBlock Text="Comparator latching" HorizontalAlignment="Center"/>
-            <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
-                      ItemsSource="{Binding Path=ComparatorLatchings}"
-                      SelectedItem="{Binding Setting.ComLatching, Mode=TwoWay}"/>
-            <TextBlock Text="Comparator queue" HorizontalAlignment="Center"/>
-            <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
-                      ItemsSource="{Binding Path=ComparatorQueue}"
-                      SelectedItem="{Binding Setting.ComQueue, Mode=TwoWay}"/>
-        </StackPanel>
+                <TextBlock Text="Comparator settings" TextAlignment="Center" FontSize="20"/>
+                <TextBlock Text="Comparator mode" HorizontalAlignment="Center"/>
+                <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
+                    ItemsSource="{Binding ComparatorModes}"
+                    SelectedItem="{Binding Setting.ComMode, Mode=TwoWay}"/>
+                <TextBlock Text="Comparator polarity" HorizontalAlignment="Center"/>
+                <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
+                    ItemsSource="{Binding ComparatorPolarities}"
+                    SelectedItem="{Binding Setting.ComPolarity, Mode=TwoWay}"/>
+                <TextBlock Text="Comparator latching" HorizontalAlignment="Center"/>
+                <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
+                    ItemsSource="{Binding ComparatorLatchings}"
+                    SelectedItem="{Binding Setting.ComLatching, Mode=TwoWay}"/>
+                <TextBlock Text="Comparator queue" HorizontalAlignment="Center"/>
+                <ComboBox HorizontalAlignment="Center" Width="300" Margin="30,0"
+                    ItemsSource="{Binding ComparatorQueue}"
+                    SelectedItem="{Binding Setting.ComQueue, Mode=TwoWay}"/>
+            </StackPanel>
 
-        <TextBlock Grid.Row="0" Text="ADS 1115 Tester App" 
+        </Grid>
+
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="ADS 1115 Tester App" 
                    TextAlignment="Center" FontSize="30"/>
-        <Button x:Name="bt_convert" Content="Convert!" Grid.Row="2"
-                HorizontalAlignment="Center" Margin="540,0,540,10" Padding="5" Width="200"
+        <Grid Grid.Row="2" Grid.ColumnSpan="2">
+            <Button x:Name="bt_convert" Content="Convert!"
+                HorizontalAlignment="Center" Margin="561,0,263,68" Padding="5" Width="200"
                 IsEnabled="True" VerticalAlignment="Bottom" Click="bt_convert_Click" Height="32"/>
-        <TextBlock Grid.Row="3" Text="Decimal value"
-                 HorizontalAlignment="Center" Padding="5" Width="150" Height="23" Margin="-410,-7,0,0"/>
-        <TextBox Grid.Row="3" Text="{Binding ConvertedValue}"
-                 HorizontalAlignment="Center" Padding="5" Width="150" Height="23" Margin="-200,0,0,0"/>
-        <TextBlock Grid.Row="3" Text="Voltage value"
-                 HorizontalAlignment="Center" Padding="5" Width="150" Height="23" Margin="510,-7,0,0"/>
-        <TextBox Grid.Row="3" Text="{Binding ConvertedVoltage}"
-                 HorizontalAlignment="Center" Padding="5" Width="150" Height="23" Margin="200,0,0,0"/>
-        <TextBox x:Name="tb_tresh_a" HorizontalAlignment="Left" Margin="235,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Height="33"/>
-        <TextBox x:Name="tb_tresh_b" HorizontalAlignment="Left" Margin="358,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="300" VerticalAlignment="Top" Height="33"/>
-        <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="181,13,0,0" Grid.Row="2" TextWrapping="Wrap" Text="Tresh A" VerticalAlignment="Top"/>
-        <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="304,13,0,0" Grid.Row="2" TextWrapping="Wrap" Text="Tresh B" VerticalAlignment="Top"/>
-        <Button x:Name="button" Content="Write Tresh" HorizontalAlignment="Left" Margin="430,8,0,0" Grid.Row="2" VerticalAlignment="Top" Height="32" Click="button_Click"/>
-        <Button x:Name="button1" Content="Turn on conversion ready pin" HorizontalAlignment="Left" Margin="872,8,0,0" Grid.Row="2" VerticalAlignment="Top" Height="31" Click="button1_Click"/>
+            <TextBox x:Name="tb_tresh_a" HorizontalAlignment="Left" Margin="235,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Height="33" Width="64"/>
+            <TextBox x:Name="tb_tresh_b" HorizontalAlignment="Left" Margin="358,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="300" VerticalAlignment="Top" Height="33" Width="64"/>
+            <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="181,13,0,0" Grid.Row="2" TextWrapping="Wrap" Text="Tresh A" VerticalAlignment="Top" Height="20" Width="50"/>
+            <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="304,13,0,0" Grid.Row="2" TextWrapping="Wrap" Text="Tresh B" VerticalAlignment="Top" Height="20" Width="48"/>
+            <Button x:Name="button" Content="Write Tresh" HorizontalAlignment="Left" Margin="430,8,0,0" Grid.Row="2" VerticalAlignment="Top" Height="32" Click="button_Click" Width="96"/>
+        </Grid>
+        <Grid Grid.Row="3" Grid.ColumnSpan="2">
+            <TextBox Text="{Binding ConvertedValue}"
+                 HorizontalAlignment="Center" Padding="5" Width="150" Margin="232,9,642,93"/>
+            <TextBlock Text="Voltage value"
+                 HorizontalAlignment="Center" Padding="5" Width="150" Margin="387,10,487,96"/>
+            <TextBox Grid.Row="3" Text="{Binding ConvertedVoltage}"
+                 HorizontalAlignment="Center" Padding="5" Width="150" Margin="537,9,337,93"/>
+            <Button x:Name="button1" Content="Turn on conversion ready pin" HorizontalAlignment="Left" Margin="726,10,0,0" VerticalAlignment="Top" Height="31" Click="button1_Click" Width="152" RenderTransformOrigin="-1.053,-0.065"/>
+        </Grid>
+        <TextBox Grid.Column="1" HorizontalAlignment="Left" Margin="10,5,0,0" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Logs}" VerticalAlignment="Top" Height="559" Width="492"/>
     </Grid>
 </Page>

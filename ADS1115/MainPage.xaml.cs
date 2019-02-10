@@ -70,6 +70,14 @@ namespace ADC
             set { Set(ref _setting, value); }
         }
         private ADS1115SensorSetting _setting = new ADS1115SensorSetting();
+
+        private string _logs;
+
+        public string Logs {
+            get { return _logs; }
+            set { Set(ref _logs, value); }
+        }
+
         #endregion
 
         public MainPage()
@@ -116,6 +124,11 @@ namespace ADC
                     var temp = adc.readContinuous();
                     ConvertedVoltage = 0;
                     ConvertedValue = temp;
+
+                    if (temp > 10000)
+                    {
+                        Logs += string.Format("\n{0};{1}",DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),temp);
+                    }
                 }
                 catch (Exception ex)
                 {
