@@ -30,28 +30,28 @@ namespace ADC.Devices.I2c.ADS1115
         { get { return _input; }
           set { Set(ref _input, value); }
         }
-        private AdcInput _input = AdcInput.A1_SE;
+        private AdcInput _input = AdcInput.A0_SE;
 
         public AdcPga Pga
         {
             get { return _pga; }
             set { Set(ref _pga, value); }
         }
-        private AdcPga _pga = AdcPga.G2;
+        private AdcPga _pga = AdcPga.G16;
 
         public AdcMode Mode
         {
             get { return _mode; }
             set { Set(ref _mode, value); }
         }
-        private AdcMode _mode = AdcMode.SINGLESHOOT_CONVERSION;
+        private AdcMode _mode = AdcMode.CONTINOUS_CONVERSION;
 
         public AdcDataRate DataRate
         {
             get { return _dataRate; }
             set { Set(ref _dataRate, value); }
         }
-        private AdcDataRate _dataRate = AdcDataRate.SPS128;
+        private AdcDataRate _dataRate = AdcDataRate.SPS8;
 
         public AdcComparatorMode ComMode
         {
@@ -79,7 +79,7 @@ namespace ADC.Devices.I2c.ADS1115
             get { return _comQueue; }
             set { Set(ref _comQueue, value); }
         }
-        private AdcComparatorQueue _comQueue = AdcComparatorQueue.DISABLE_COMPARATOR;
+        private AdcComparatorQueue _comQueue = AdcComparatorQueue.ASSERT_AFTER_FOUR;
         #endregion
 
         #region INotifyPropertyChanged implementation

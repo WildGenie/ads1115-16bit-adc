@@ -88,7 +88,7 @@ namespace ADC
 
             // Initialize the DispatcherTimer
             timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(500);
+            timer.Interval = TimeSpan.FromMilliseconds(1000);
             timer.Tick += timer_tick;
 
             // Initialize the sensors
@@ -130,6 +130,42 @@ namespace ADC
             {
                 adc = new ADS1115Sensor(AdcAddress.GND);
                 await adc.InitializeAsync();
+                if (Setting.Mode == AdcMode.CONTINOUS_CONVERSION)
+                {
+                    if (adc != null && adc.IsInitialized)
+                    {
+                        try
+                        {
+                            await adc.readContinuousInit(Setting);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception("Initialization of continuous read has failed" + ex);
+                        }
+
+                        timer.Start();
+                    }
+                }
+                else
+                {
+                    timer.Stop();
+
+                    if (adc != null && adc.IsInitialized)
+                    {
+                        try
+                        {
+                            var temp = await adc.readSingleShot(Setting);
+                            ConvertedValue = temp.DecimalValue;
+                            ConvertedVoltage = temp.VoltageValue;
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception("Read from ADS1115 has failed: " + ex);
+                        }
+                    }
+                }
+                await adc.writeTreshold(ushort.Parse(tb_tresh_a.Text), ushort.Parse(tb_tresh_b.Text));
+
             }
             catch (Exception ex)
             {
