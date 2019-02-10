@@ -71,8 +71,8 @@
                  HorizontalAlignment="Center" Padding="5" Width="150" Height="23" Margin="510,-7,0,0"/>
         <TextBox Grid.Row="3" Text="{Binding ConvertedVoltage}"
                  HorizontalAlignment="Center" Padding="5" Width="150" Height="23" Margin="200,0,0,0"/>
-        <TextBox x:Name="tb_tresh_a" HorizontalAlignment="Left" Margin="235,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="33"/>
-        <TextBox x:Name="tb_tresh_b" HorizontalAlignment="Left" Margin="358,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Height="33"/>
+        <TextBox x:Name="tb_tresh_a" HorizontalAlignment="Left" Margin="235,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Height="33"/>
+        <TextBox x:Name="tb_tresh_b" HorizontalAlignment="Left" Margin="358,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="300" VerticalAlignment="Top" Height="33"/>
         <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="181,13,0,0" Grid.Row="2" TextWrapping="Wrap" Text="Tresh A" VerticalAlignment="Top"/>
         <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="304,13,0,0" Grid.Row="2" TextWrapping="Wrap" Text="Tresh B" VerticalAlignment="Top"/>
         <Button x:Name="button" Content="Write Tresh" HorizontalAlignment="Left" Margin="430,8,0,0" Grid.Row="2" VerticalAlignment="Top" Height="32" Click="button_Click"/>
