@@ -256,20 +256,7 @@ namespace ADC
             {
 
 
-                //if (dt < new DateTime(2019, 02, 16) || dt < DateTime.Now)
-                //{
-                //    this.rtc.DateTime = DateTime.Now;
-                //    WriteLog("RTC'nin saati ayarlandı.");
-                //    dt = rtc.DateTime;
-                //    WriteLog($"RTC Saatı: {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
-
-                //}
-                //else
-                //{
-                //    var sysTime = new SystemTime(dt);
-                //    SetSystemTime(ref sysTime);
-                //    WriteLog("RTC'den sistem saati ayarlandı.");
-                //}
+               
 
                 await Ds3231.Initialize();
                 DateTime dt = Ds3231.Now;
@@ -278,6 +265,20 @@ namespace ADC
                 WriteLog($"RTC Saatı: {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
                 WriteLog($"Sistem Saatı: {DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}");
                 WriteLog($"RTC Sıcaklık: {rtcTemp} ℃");
+                if (dt < new DateTime(2019, 02, 16) || dt < DateTime.Now)
+                {
+                    Ds3231.Now = DateTime.Now;
+                    WriteLog("RTC'nin saati ayarlandı.");
+                    dt = Ds3231.Now;
+                    WriteLog($"RTC Saatı: {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
+
+                }
+                else
+                {
+                    var sysTime = new SystemTime(dt);
+                    SetSystemTime(ref sysTime);
+                    WriteLog("RTC'den sistem saati ayarlandı.");
+                }
 
                 adc = new ADS1115Sensor(AdcAddress.GND);
                 await adc.InitializeAsync();
