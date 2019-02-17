@@ -13,6 +13,7 @@ namespace ADC
 {
     using System.Runtime.InteropServices;
     using Windows.Devices.Enumeration;
+    using Windows.Devices.Gpio;
     using Windows.UI.Core;
 
     public sealed partial class MainPage : Page, INotifyPropertyChanged
@@ -254,9 +255,6 @@ namespace ADC
             try
             {
 
-                //WriteLog($"RTC Saatı: {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
-                //WriteLog($"Sistem Saatı: {DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}");
-                //WriteLog($"RTC Sıcaklık: {rtcTemp} ℃");
 
                 //if (dt < new DateTime(2019, 02, 16) || dt < DateTime.Now)
                 //{
@@ -272,6 +270,14 @@ namespace ADC
                 //    SetSystemTime(ref sysTime);
                 //    WriteLog("RTC'den sistem saati ayarlandı.");
                 //}
+
+                await Ds3231.Initialize();
+                DateTime dt = Ds3231.Now;
+                double rtcTemp = Ds3231.Temperature;
+
+                WriteLog($"RTC Saatı: {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
+                WriteLog($"Sistem Saatı: {DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}");
+                WriteLog($"RTC Sıcaklık: {rtcTemp} ℃");
 
                 adc = new ADS1115Sensor(AdcAddress.GND);
                 await adc.InitializeAsync();
