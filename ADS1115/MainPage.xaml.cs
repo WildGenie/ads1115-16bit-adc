@@ -11,6 +11,10 @@ using Windows.Devices;
 
 namespace ADC
 {
+    using System.Runtime.InteropServices;
+    using Windows.Devices.Enumeration;
+    using Windows.UI.Core;
+
     public sealed partial class MainPage : Page, INotifyPropertyChanged
     {
         #region Fields
@@ -78,6 +82,9 @@ namespace ADC
             set { Set(ref _logs, value); }
         }
 
+        Windows.UI.Core.CoreDispatcher dispatcher;
+        public static DeviceWatcher watcher = null;
+
         #endregion
 
         public MainPage()
@@ -89,7 +96,7 @@ namespace ADC
 
             // Register for the unloaded event so we can clean up upon exit
             Unloaded += MainPage_Unloaded;
-            
+
             // Set Lightning as the default provider
             if (LightningProvider.IsLightningEnabled)
                 LowLevelDevicesController.DefaultProvider = LightningProvider.GetAggregateProvider();
@@ -99,8 +106,76 @@ namespace ADC
             timer.Interval = TimeSpan.FromMilliseconds(1000);
             timer.Tick += timer_tick;
 
+
+            //string aqs = "System.Devices.InterfaceClassGuid:=\"{36FC9E60-C465-11CF-8056-444553540000}\" AND System.Devices.InterfaceEnabled:=System.StructuredQueryType.Boolean#True";
+
+            //DeviceWatcher DW = DeviceInformation.CreateWatcher();  //Advance querry string
+            //DW.Added += DeviceAddedEvent;
+            //DW.Removed += DeviceRemovedEvent;
+            //DW.Updated += DeviceUpdatedEvent;
+
+
+            dispatcher = Window.Current.CoreWindow.Dispatcher;
+            watcher = DeviceInformation.CreateWatcher(DeviceClass.PortableStorageDevice);
+            // Add event handlers
+            watcher.Added += DeviceAddedEvent;
+            watcher.Removed += DeviceRemovedEvent;
+            watcher.Updated += DeviceUpdatedEvent;
+            watcher.EnumerationCompleted += DeviceEnumerationCompletedEvent;
+            watcher.Stopped += DeviceStoppedEvent;
+            watcher.Start();
+
             // Initialize the sensors
             InitializeSensors();
+        }
+
+        private void DeviceStoppedEvent(DeviceWatcher sender, object args)
+        {
+            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    WriteLog("DeviceStoppedEvent");
+                });
+        }
+
+        private void DeviceEnumerationCompletedEvent(DeviceWatcher sender, object args)
+        {
+            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    WriteLog("DeviceEnumerationCompletedEvent");
+                });
+        }
+
+
+        private void DeviceAddedEvent(DeviceWatcher sender, DeviceInformation deviceInterface)
+        {
+            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    WriteLog("DeviceAddedEvent");
+                });
+        }
+
+        private void DeviceRemovedEvent(DeviceWatcher sender, DeviceInformationUpdate devUpdate)
+        {
+
+            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    WriteLog("DeviceRemovedEvent");
+                });
+        }
+
+        private void DeviceUpdatedEvent(DeviceWatcher sender, DeviceInformationUpdate devUpdate)
+        {
+            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                {
+                    
+                    WriteLog("DeviceUpdatedEvent" + devUpdate.Id);
+                });
+        }
+
+        private void WriteLog(string messsage)
+        {
+            Logs = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + ";" + messsage + "\r\n" + Logs;
+
         }
 
         private void MainPage_Unloaded(object sender, RoutedEventArgs e)
@@ -127,7 +202,8 @@ namespace ADC
 
                     if (temp > 10000)
                     {
-                        Logs += string.Format("\n{0};{1}",DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),temp);
+                        //Logs = string.Format("\n{0};{1}",DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),temp) + Logs;
+                        WriteLog(temp.ToString());
                     }
                 }
                 catch (Exception ex)
@@ -137,10 +213,66 @@ namespace ADC
             }
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct SystemTime
+        {
+            [MarshalAs(UnmanagedType.U2)]
+            public short Year;
+            [MarshalAs(UnmanagedType.U2)]
+            public short Month;
+            [MarshalAs(UnmanagedType.U2)]
+            public short DayOfWeek;
+            [MarshalAs(UnmanagedType.U2)]
+            public short Day;
+            [MarshalAs(UnmanagedType.U2)]
+            public short Hour;
+            [MarshalAs(UnmanagedType.U2)]
+            public short Minute;
+            [MarshalAs(UnmanagedType.U2)]
+            public short Second;
+            [MarshalAs(UnmanagedType.U2)]
+            public short Milliseconds;
+
+            public SystemTime(DateTime dt)
+            {
+                Year = (short)dt.Year;
+                Month = (short)dt.Month;
+                DayOfWeek = (short)dt.DayOfWeek;
+                Day = (short)dt.Day;
+                Hour = (short)dt.Hour;
+                Minute = (short)dt.Minute;
+                Second = (short)dt.Second;
+                Milliseconds = (short)dt.Millisecond;
+            }
+        }
+
+        [DllImport("kernelbase.dll", SetLastError = true)]
+        static extern bool SetSystemTime(ref SystemTime time);
+
         private async void InitializeSensors()
         {
             try
             {
+
+                //WriteLog($"RTC Saatı: {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
+                //WriteLog($"Sistem Saatı: {DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss")}");
+                //WriteLog($"RTC Sıcaklık: {rtcTemp} ℃");
+
+                //if (dt < new DateTime(2019, 02, 16) || dt < DateTime.Now)
+                //{
+                //    this.rtc.DateTime = DateTime.Now;
+                //    WriteLog("RTC'nin saati ayarlandı.");
+                //    dt = rtc.DateTime;
+                //    WriteLog($"RTC Saatı: {dt.ToString("yyyy/MM/dd HH:mm:ss")}");
+
+                //}
+                //else
+                //{
+                //    var sysTime = new SystemTime(dt);
+                //    SetSystemTime(ref sysTime);
+                //    WriteLog("RTC'den sistem saati ayarlandı.");
+                //}
+
                 adc = new ADS1115Sensor(AdcAddress.GND);
                 await adc.InitializeAsync();
                 if (Setting.Mode == AdcMode.CONTINOUS_CONVERSION)
@@ -182,6 +314,8 @@ namespace ADC
             }
             catch (Exception ex)
             {
+                WriteLog("Initialization has failed: " + ex);
+
                 throw new Exception("Initialization has failed: " + ex);
             }
         }
