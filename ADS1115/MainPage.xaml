@@ -70,13 +70,16 @@
                    TextAlignment="Center" FontSize="30"/>
         <Grid Grid.Row="2" Grid.ColumnSpan="2">
             <Button x:Name="bt_convert" Content="Convert!"
-                HorizontalAlignment="Center" Margin="561,0,263,68" Padding="5" Width="200"
+                HorizontalAlignment="Left" Margin="181,0,0,23" Padding="5" Width="200"
                 IsEnabled="True" VerticalAlignment="Bottom" Click="bt_convert_Click" Height="32"/>
             <TextBox x:Name="tb_tresh_a" HorizontalAlignment="Left" Margin="235,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Height="33" Width="64"/>
             <TextBox x:Name="tb_tresh_b" HorizontalAlignment="Left" Margin="358,7,0,0" Grid.Row="2" TextWrapping="Wrap" Text="300" VerticalAlignment="Top" Height="33" Width="64"/>
             <TextBlock x:Name="textBlock" HorizontalAlignment="Left" Margin="181,13,0,0" Grid.Row="2" TextWrapping="Wrap" Text="Tresh A" VerticalAlignment="Top" Height="20" Width="50"/>
             <TextBlock x:Name="textBlock_Copy" HorizontalAlignment="Left" Margin="304,13,0,0" Grid.Row="2" TextWrapping="Wrap" Text="Tresh B" VerticalAlignment="Top" Height="20" Width="48"/>
             <Button x:Name="button" Content="Write Tresh" HorizontalAlignment="Left" Margin="430,8,0,0" Grid.Row="2" VerticalAlignment="Top" Height="32" Click="button_Click" Width="96"/>
+            <DatePicker x:Name="dpDate" HorizontalAlignment="Left" Margin="640,10,0,0" VerticalAlignment="Top"/>
+            <TimePicker x:Name="tpTime" HorizontalAlignment="Left" Margin="965,10,0,0" VerticalAlignment="Top"/>
+            <Button Content="Manuel DateTime Update" HorizontalAlignment="Left" Margin="640,56,0,0" VerticalAlignment="Top" RenderTransformOrigin="1.521,-0.118" Width="199" Click="Button_Click_1"/>
         </Grid>
         <Grid Grid.Row="3" Grid.ColumnSpan="2">
             <TextBox Text="{Binding ConvertedValue}"
@@ -85,7 +88,7 @@
                  HorizontalAlignment="Center" Padding="5" Width="150" Margin="387,10,487,96"/>
             <TextBox Grid.Row="3" Text="{Binding ConvertedVoltage}"
                  HorizontalAlignment="Center" Padding="5" Width="150" Margin="537,9,337,93"/>
-            <Button x:Name="button1" Content="Turn on conversion ready pin" HorizontalAlignment="Left" Margin="726,10,0,0" VerticalAlignment="Top" Height="31" Click="button1_Click" Width="152" RenderTransformOrigin="-1.053,-0.065"/>
+            <Button x:Name="button1" Content="Turn on conversion ready pin" HorizontalAlignment="Left" Margin="856,10,0,0" VerticalAlignment="Top" Height="31" Click="button1_Click" Width="152" RenderTransformOrigin="-1.053,-0.065"/>
         </Grid>
         <TextBox Grid.Column="1" HorizontalAlignment="Left" Margin="10,5,0,0" Grid.Row="1" TextWrapping="Wrap" Text="{Binding Logs}" VerticalAlignment="Top" Height="559" Width="492"/>
     </Grid>

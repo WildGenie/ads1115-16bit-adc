@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
 using ADC.Devices.I2c.ADS1115;
 using Microsoft.IoT.Lightning.Providers;
 using Windows.Devices;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 
 namespace ADC
 {
-    using System.Runtime.InteropServices;
     using Windows.Devices.Enumeration;
     using Windows.Devices.Gpio;
+    using Windows.Storage;
+    using Windows.System;
     using Windows.UI.Core;
 
     public sealed partial class MainPage : Page, INotifyPropertyChanged
@@ -30,7 +31,10 @@ namespace ADC
         {
             // if unchanged return false
             if (Equals(storage, value))
+            {
                 return false;
+            }
+
             storage = value;
             RaisePropertyChanged(propertyName);
             return true;
@@ -57,54 +61,58 @@ namespace ADC
         #region Properties
         public double ConvertedValue
         {
-            get { return _convertedValue; }
-            set { Set(ref _convertedValue, value); }
+            get => _convertedValue;
+            set => Set(ref _convertedValue, value);
         }
         private double _convertedValue = 0;
 
         public double ConvertedVoltage
         {
-            get { return _convertedVoltage; }
-            set { Set(ref _convertedVoltage, value); }
+            get => _convertedVoltage;
+            set => Set(ref _convertedVoltage, value);
         }
         private double _convertedVoltage = 0;
 
         public ADS1115SensorSetting Setting
         {
-            get { return _setting; }
-            set { Set(ref _setting, value); }
+            get => _setting;
+            set => Set(ref _setting, value);
         }
         private ADS1115SensorSetting _setting = new ADS1115SensorSetting();
 
         private string _logs;
 
         public string Logs {
-            get { return _logs; }
-            set { Set(ref _logs, value); }
+            get => _logs;
+            set => Set(ref _logs, value);
         }
 
-        Windows.UI.Core.CoreDispatcher dispatcher;
+        private Windows.UI.Core.CoreDispatcher dispatcher;
         public static DeviceWatcher watcher = null;
 
         #endregion
 
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
 
             // Setting the DataContext
-            this.DataContext = this;
+            DataContext = this;
 
             // Register for the unloaded event so we can clean up upon exit
             Unloaded += MainPage_Unloaded;
 
             // Set Lightning as the default provider
             if (LightningProvider.IsLightningEnabled)
+            {
                 LowLevelDevicesController.DefaultProvider = LightningProvider.GetAggregateProvider();
+            }
 
             // Initialize the DispatcherTimer
-            timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromMilliseconds(1000);
+            timer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(1000)
+            };
             timer.Tick += timer_tick;
 
 
@@ -132,7 +140,7 @@ namespace ADC
 
         private void DeviceStoppedEvent(DeviceWatcher sender, object args)
         {
-            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            Windows.Foundation.IAsyncAction task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     WriteLog("DeviceStoppedEvent");
                 });
@@ -140,7 +148,7 @@ namespace ADC
 
         private void DeviceEnumerationCompletedEvent(DeviceWatcher sender, object args)
         {
-            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            Windows.Foundation.IAsyncAction task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
                     WriteLog("DeviceEnumerationCompletedEvent");
                 });
@@ -149,39 +157,63 @@ namespace ADC
 
         private void DeviceAddedEvent(DeviceWatcher sender, DeviceInformation deviceInterface)
         {
-            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            Windows.Foundation.IAsyncAction task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    WriteLog("DeviceAddedEvent");
+                    WriteLog("DeviceAddedEvent: " + deviceInterface.Id);
                 });
         }
 
         private void DeviceRemovedEvent(DeviceWatcher sender, DeviceInformationUpdate devUpdate)
         {
 
-            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            Windows.Foundation.IAsyncAction task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    WriteLog("DeviceRemovedEvent");
+                    WriteLog("DeviceRemovedEvent: " + devUpdate.Id);
                 });
         }
 
         private void DeviceUpdatedEvent(DeviceWatcher sender, DeviceInformationUpdate devUpdate)
         {
-            var task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            Windows.Foundation.IAsyncAction task = Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                 {
-                    
-                    WriteLog("DeviceUpdatedEvent" + devUpdate.Id);
+
+                    WriteLog("DeviceUpdatedEvent Id: " + devUpdate.Id);
                 });
         }
 
-        private void WriteLog(string messsage)
-        {
-            Logs = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + ";" + messsage + "\r\n" + Logs;
+        private void WriteLog(string messsage) => Logs = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ";" + messsage + "\r\n" + Logs;
 
+        private async void WriteUsbAsync(string messsage)
+        {
+            try
+            {
+                string yazilacak = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ";" + messsage + "\r\n";
+                StorageFolder externalDevices = KnownFolders.RemovableDevices;
+
+                IReadOnlyList<StorageFolder> externalDrives = await externalDevices.GetFoldersAsync();
+
+                StorageFolder sdCard = externalDrives.FirstOrDefault();
+
+                if (sdCard != null)
+                {
+                    StorageFile ticketsFile = await sdCard.CreateFileAsync(DateTime.Today.ToString("yyyyMMdd") + ".csv", CreationCollisionOption.OpenIfExists);
+                    if (ticketsFile.IsAvailable)
+                    {
+                        await FileIO.AppendTextAsync(ticketsFile, yazilacak);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteLog("Dosya yazdırılırken hata: " + ex);
+            }
+
+            //Create the text file to hold the data
         }
 
         private void MainPage_Unloaded(object sender, RoutedEventArgs e)
         {
-            if(adc != null)
+            if (adc != null)
             {
                 adc.Dispose();
                 adc = null;
@@ -197,66 +229,29 @@ namespace ADC
             {
                 try
                 {
-                    var temp = adc.readContinuous();
+                    int temp = adc.readContinuous();
                     ConvertedVoltage = 0;
                     ConvertedValue = temp;
 
-                    if (temp > 10000)
+                    if (temp > 1000)
                     {
-                        //Logs = string.Format("\n{0};{1}",DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss"),temp) + Logs;
-                        WriteLog(temp.ToString());
+                        //Logs = string.Format("\n{0};{1}",DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),temp) + Logs;
+                        WriteLog("Titreşim Değeri: " + temp);
+                        WriteUsbAsync(temp.ToString());
                     }
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Continuous read has failed" + ex);
+                    WriteLog("Continuous read has failed: " + ex);
+                    //throw new Exception("Continuous read has failed: " + ex);
                 }
             }
         }
-
-        [StructLayout(LayoutKind.Sequential)]
-        public struct SystemTime
-        {
-            [MarshalAs(UnmanagedType.U2)]
-            public short Year;
-            [MarshalAs(UnmanagedType.U2)]
-            public short Month;
-            [MarshalAs(UnmanagedType.U2)]
-            public short DayOfWeek;
-            [MarshalAs(UnmanagedType.U2)]
-            public short Day;
-            [MarshalAs(UnmanagedType.U2)]
-            public short Hour;
-            [MarshalAs(UnmanagedType.U2)]
-            public short Minute;
-            [MarshalAs(UnmanagedType.U2)]
-            public short Second;
-            [MarshalAs(UnmanagedType.U2)]
-            public short Milliseconds;
-
-            public SystemTime(DateTime dt)
-            {
-                Year = (short)dt.Year;
-                Month = (short)dt.Month;
-                DayOfWeek = (short)dt.DayOfWeek;
-                Day = (short)dt.Day;
-                Hour = (short)dt.Hour;
-                Minute = (short)dt.Minute;
-                Second = (short)dt.Second;
-                Milliseconds = (short)dt.Millisecond;
-            }
-        }
-
-        [DllImport("kernelbase.dll", SetLastError = true)]
-        static extern bool SetSystemTime(ref SystemTime time);
 
         private async void InitializeSensors()
         {
             try
             {
-
-
-               
 
                 await Ds3231.Initialize();
                 DateTime dt = Ds3231.Now;
@@ -275,8 +270,7 @@ namespace ADC
                 }
                 else
                 {
-                    var sysTime = new SystemTime(dt);
-                    SetSystemTime(ref sysTime);
+                    DateTimeSettings.SetSystemDateTime(dt.ToUniversalTime());
                     WriteLog("RTC'den sistem saati ayarlandı.");
                 }
 
@@ -292,6 +286,7 @@ namespace ADC
                         }
                         catch (Exception ex)
                         {
+                            WriteLog("Initialization of continuous read has failed" + ex);
                             throw new Exception("Initialization of continuous read has failed" + ex);
                         }
 
@@ -306,13 +301,14 @@ namespace ADC
                     {
                         try
                         {
-                            var temp = await adc.readSingleShot(Setting);
+                            ADS1115SensorData temp = await adc.readSingleShot(Setting);
                             ConvertedValue = temp.DecimalValue;
                             ConvertedVoltage = temp.VoltageValue;
                         }
                         catch (Exception ex)
                         {
-                            throw new Exception("Read from ADS1115 has failed: " + ex);
+                            WriteLog("Read from ADS1115 has failed: " + ex);
+                            //throw new Exception("Read from ADS1115 has failed: " + ex);
                         }
                     }
                 }
@@ -322,8 +318,7 @@ namespace ADC
             catch (Exception ex)
             {
                 WriteLog("Initialization has failed: " + ex);
-
-                throw new Exception("Initialization has failed: " + ex);
+                //throw new Exception("Initialization has failed: " + ex);
             }
         }
 
@@ -339,11 +334,12 @@ namespace ADC
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Initialization of continuous read has failed" + ex);
+                        WriteLog("Initialization of continuous read has failed: " + ex);
+                        //throw new Exception("Initialization of continuous read has failed: " + ex);
                     }
 
                     timer.Start();
-                }      
+                }
             }
             else
             {
@@ -353,26 +349,30 @@ namespace ADC
                 {
                     try
                     {
-                        var temp = await adc.readSingleShot(Setting);
+                        ADS1115SensorData temp = await adc.readSingleShot(Setting);
                         ConvertedValue = temp.DecimalValue;
                         ConvertedVoltage = temp.VoltageValue;
                     }
                     catch (Exception ex)
                     {
-                        throw new Exception("Read from ADS1115 has failed: " + ex);
+                        WriteLog("Read from ADS1115 has failed: " + ex);
+                        //throw new Exception("Read from ADS1115 has failed: " + ex);
                     }
                 }
             }
         }
 
-        private async void button_Click(object sender, RoutedEventArgs e)
-        {
-            await adc.writeTreshold(ushort.Parse(tb_tresh_a.Text), ushort.Parse(tb_tresh_b.Text));
-        }
+        private async void button_Click(object sender, RoutedEventArgs e) => await adc.writeTreshold(ushort.Parse(tb_tresh_a.Text), ushort.Parse(tb_tresh_b.Text));
 
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void button1_Click(object sender, RoutedEventArgs e) => adc.TurnAlertIntoConversionReady();
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            adc.TurnAlertIntoConversionReady();
+            DateTime time = dpDate.SelectedDate.GetValueOrDefault(DateTime.Now.Date).Date.Add(tpTime.SelectedTime.GetValueOrDefault(DateTime.Now.TimeOfDay));
+            DateTimeSettings.SetSystemDateTime(time.ToUniversalTime());
+            Ds3231.Now = time;
+            WriteLog("RTC'nin ve sistemin saati ayarlandı: " + time.ToString("yyyy/MM/dd HH:mm:ss"));
+
         }
     }
 }
