@@ -32,6 +32,7 @@ using Windows.Devices.Enumeration;
 //*************************************************************************************************
 namespace Windows.Devices.Gpio
 {
+    using Windows.Networking.Connectivity;
 
     //  ####    ####   ###    ###    ###     #
     //  #   #  #      #   #  #   #  #   #   ##
